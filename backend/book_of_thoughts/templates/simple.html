@@ -100,7 +100,7 @@
                                     <h4>Study Scripture</h4>
                                     <p>Explore biblical wisdom and passages</p>
                                 </div>
-                                <div className="start-card" onClick={() => setActiveSection && setActiveSection('graph')}>
+                                <div className="start-card" onClick={() => window.location.href = '/graph/'}>
                                     <i className="fas fa-project-diagram"></i>
                                     <h4>View Graph</h4>
                                     <p>Visualize content relationships</p>
@@ -115,7 +115,7 @@
         function Sidebar({ expanded, setExpanded, activeSection, setActiveSection }) {
             const sections = [
                 { id: 'start', label: 'Start Here', icon: 'fas fa-home', count: 0 },
-                { id: 'graph', label: 'Graph View', icon: 'fas fa-project-diagram', count: 0 },
+                { id: 'graph', label: 'Graph View', icon: 'fas fa-project-diagram', count: 0, isLink: true, url: '/graph/' },
                 { id: 'recent', label: 'Recent', icon: 'fas fa-clock', count: 0 },
                 { id: 'topics', label: 'Topics', icon: 'fas fa-folder', count: 0 },
                 { id: 'thoughts', label: 'Thoughts', icon: 'fas fa-lightbulb', count: 0 },
@@ -144,7 +144,13 @@
                             <button
                                 key={section.id}
                                 className={`nav-item ${activeSection === section.id ? 'active' : ''}`}
-                                onClick={() => setActiveSection(section.id)}
+                                onClick={() => {
+                                    if (section.isLink && section.url) {
+                                        window.location.href = section.url;
+                                    } else {
+                                        setActiveSection(section.id);
+                                    }
+                                }}
                                 title={section.label}
                             >
                                 <i className={section.icon}></i>

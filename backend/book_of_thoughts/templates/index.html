@@ -33,7 +33,6 @@
                 recent: []
             });
             const [loading, setLoading] = useState(false);
-            const [graphData, setGraphData] = useState({ nodes: [], links: [] });
 
             // Fetch data from API
             const fetchData = async (endpoint) => {
@@ -54,18 +53,16 @@
             // Load initial data
             useEffect(() => {
                 const loadInitialData = async () => {
-                    const [thoughts, topics, quotes, passages, tags, recent, graph] = await Promise.all([
+                    const [thoughts, topics, quotes, passages, tags, recent] = await Promise.all([
                         fetchData('thoughts'),
                         fetchData('topics'),
                         fetchData('quotes'),
                         fetchData('passages'),
                         fetchData('tags'),
-                        fetchData('recent'),
-                        fetchData('graph')
+                        fetchData('recent')
                     ]);
                     
                     setData({ thoughts, topics, quotes, passages, tags, recent });
-                    setGraphData(graph);
                 };
                 
                 loadInitialData();
@@ -104,7 +101,6 @@
                         data={data}
                         loading={loading}
                         sidebarExpanded={sidebarExpanded}
-                        graphData={graphData}
                     />
                 </div>
             );
@@ -127,7 +123,7 @@
                 { id: 'passages', label: 'Bible', icon: 'fas fa-book', count: data.passages?.length || 0 },
                 { id: 'tags', label: 'Tags', icon: 'fas fa-tags', count: data.tags?.length || 0 },
                 { id: 'recent', label: 'Recent', icon: 'fas fa-clock', count: data.recent?.length || 0 },
-                { id: 'graph', label: 'Graph View', icon: 'fas fa-project-diagram', count: 0 }
+                { id: 'graph', label: 'Graph View', icon: 'fas fa-project-diagram', count: 0, isLink: true, url: '/graph/' }
             ];
 
             return (
@@ -166,7 +162,13 @@
                             <button
                                 key={section.id}
                                 className={`nav-item ${activeSection === section.id ? 'active' : ''}`}
-                                onClick={() => setActiveSection(section.id)}
+                                onClick={() => {
+                                    if (section.isLink && section.url) {
+                                        window.location.href = section.url;
+                                    } else {
+                                        setActiveSection(section.id);
+                                    }
+                                }}
                                 title={section.label}
                             >
                                 <i className={section.icon}></i>
@@ -184,7 +186,7 @@
         }
 
         // Main Content Component
-        function MainContent({ activeSection, data, loading, sidebarExpanded, graphData }) {
+        function MainContent({ activeSection, data, loading, sidebarExpanded }) {
             const renderContent = () => {
                 if (loading) {
                     return <div className="loading">Loading...</div>;
@@ -207,8 +209,6 @@
                         return <ContentList items={data.recent} type="mixed" />;
                     case 'search':
                         return <ContentList items={data.searchResults || []} type="mixed" />;
-                    case 'graph':
-                        return <GraphView data={graphData} />;
                     default:
                         return <StartHereView setActiveSection={setActiveSection} />;
                 }
@@ -297,81 +297,6 @@
             );
         }
 
-        // Graph View Component
-        function GraphView({ data }) {
-            const svgRef = useRef();
-
-            useEffect(() => {
-                if (!data.nodes || !data.links || !svgRef.current) return;
-
-                const svg = d3.select(svgRef.current);
-                svg.selectAll("*").remove();
-
-                const width = 800;
-                const height = 600;
-
-                const simulation = d3.forceSimulation(data.nodes)
-                    .force("link", d3.forceLink(data.links).id(d => d.id))
-                    .force("charge", d3.forceManyBody().strength(-300))
-                    .force("center", d3.forceCenter(width / 2, height / 2));
-
-                const link = svg.append("g")
-                    .selectAll("line")
-                    .data(data.links)
-                    .enter().append("line")
-                    .attr("stroke", "#999")
-                    .attr("stroke-opacity", 0.6);
-
-                const node = svg.append("g")
-                    .selectAll("circle")
-                    .data(data.nodes)
-                    .enter().append("circle")
-                    .attr("r", 8)
-                    .attr("fill", d => {
-                        const colors = { 1: "#ff6b6b", 2: "#4ecdc4", 3: "#45b7d1", 4: "#96ceb4" };
-                        return colors[d.group] || "#ccc";
-                    })
-                    .call(d3.drag()
-                        .on("start", dragstarted)
-                        .on("drag", dragged)
-                        .on("end", dragended));
-
-                node.append("title").text(d => d.title);
-
-                simulation.on("tick", () => {
-                    link.attr("x1", d => d.source.x)
-                        .attr("y1", d => d.source.y)
-                        .attr("x2", d => d.target.x)
-                        .attr("y2", d => d.target.y);
-
-                    node.attr("cx", d => d.x)
-                        .attr("cy", d => d.y);
-                });
-
-                function dragstarted(event, d) {
-                    if (!event.active) simulation.alphaTarget(0.3).restart();
-                    d.fx = d.x;
-                    d.fy = d.y;
-                }
-
-                function dragged(event, d) {
-                    d.fx = event.x;
-                    d.fy = event.y;
-                }
-
-                function dragended(event, d) {
-                    if (!event.active) simulation.alphaTarget(0);
-                    d.fx = null;
-                    d.fy = null;
-                }
-            }, [data]);
-
-            return (
-                <div className="graph-view">
-                    <svg ref={svgRef} width="800" height="600"></svg>
-                </div>
-            );
-        }
 
         // Start Here View Component
         function StartHereView({ setActiveSection }) {
@@ -508,7 +433,7 @@
                                     <h4>Study Scripture</h4>
                                     <p>Explore biblical wisdom and passages</p>
                                 </div>
-                                <div className="start-card" onClick={() => setActiveSection('graph')}>
+                                <div className="start-card" onClick={() => window.location.href = '/graph/'}>
                                     <i className="fas fa-project-diagram"></i>
                                     <h4>View Graph</h4>
                                     <p>Visualize content relationships</p>

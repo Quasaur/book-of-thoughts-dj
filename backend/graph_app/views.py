@@ -10,7 +10,11 @@ def graph_data_api(request):
     """API endpoint for graph data - separate from thoughts_api"""
     try:
         graph_data = neo4j_service.get_graph_data()
-        return JsonResponse(graph_data, safe=False)
+        # neo4j_service.get_graph_data() returns a list with one dict, we need just the dict
+        if graph_data and len(graph_data) > 0:
+            return JsonResponse(graph_data[0], safe=False)
+        else:
+            return JsonResponse({'nodes': [], 'links': []}, safe=False)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
