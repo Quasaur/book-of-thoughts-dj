@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph View - Book of Thoughts</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .graph-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .controls {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .legend {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .info {
+            font-size: 14px;
+            color: #666;
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Knowledge Graph Visualization</h1>
+            <p>Interactive visualization of connections between topics, thoughts, quotes, and passages</p>
+        </div>
+        
+        <div class="controls">
+            <div class="info">
+                <span id="node-count">Loading...</span> nodes, 
+                <span id="link-count">Loading...</span> connections
+            </div>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #8B5CF6;"></div>
+                    <span>Topics</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #10B981;"></div>
+                    <span>Thoughts</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #F59E0B;"></div>
+                    <span>Quotes</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #3B82F6;"></div>
+                    <span>Passages</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #EF4444;"></div>
+                    <span>Content</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #6B7280;"></div>
+                    <span>Description</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="graph-container">
+            <div id="loading" class="loading">Loading graph data...</div>
+            <div id="error" class="error" style="display: none;">Failed to load graph data</div>
+            <svg id="graph-svg" style="display: none;"></svg>
+        </div>
+    </div>
+
+    <script>
+        // Graph visualization code
+        const width = 1160;
+        const height = 600;
+        
+        // Color scale for different node types
+        const colorScale = {
+            'TOPIC': '#8B5CF6',
+            'THOUGHT': '#10B981',
+            'QUOTE': '#F59E0B',
+            'PASSAGE': '#3B82F6',
+            'CONTENT': '#EF4444',
+            'DESCRIPTION': '#6B7280'
+        };
+
+        async function loadGraphData() {
+            try {
+                const response = await fetch('/graph/api/data/');
+                if (!response.ok) throw new Error('Failed to fetch graph data');
+                return await response.json();
+            } catch (error) {
+                console.error('Error loading graph data:', error);
+                throw error;
+            }
+        }
+
+        function createGraph(data) {
+            const svg = d3.select('#graph-svg')
+                .attr('width', width)
+                .attr('height', height)
+                .style('display', 'block');
+
+            // Clear any existing content
+            svg.selectAll('*').remove();
+
+            // Update counters
+            document.getElementById('node-count').textContent = data.nodes.length;
+            document.getElementById('link-count').textContent = data.links.length;
+
+            // Create simulation
+            const simulation = d3.forceSimulation(data.nodes)
+                .force('link', d3.forceLink(data.links).id(d => d.id).distance(100))
+                .force('charge', d3.forceManyBody().strength(-300))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collision', d3.forceCollide().radius(30));
+
+            // Create links
+            const link = svg.append('g')
+                .attr('stroke', '#999')
+                .attr('stroke-opacity', 0.6)
+                .selectAll('line')
+                .data(data.links)
+                .join('line')
+                .attr('stroke-width', 1);
+
+            // Create nodes
+            const node = svg.append('g')
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 1.5)
+                .selectAll('circle')
+                .data(data.nodes)
+                .join('circle')
+                .attr('r', d => Math.sqrt((d.size || 10) * 3))
+                .attr('fill', d => colorScale[d.type] || '#666')
+                .call(d3.drag()
+                    .on('start', dragstarted)
+                    .on('drag', dragged)
+                    .on('end', dragended));
+
+            // Add labels
+            const label = svg.append('g')
+                .selectAll('text')
+                .data(data.nodes)
+                .join('text')
+                .text(d => d.title || d.name || d.id)
+                .style('font-size', '10px')
+                .style('font-family', 'Arial, sans-serif')
+                .style('fill', '#333')
+                .style('text-anchor', 'middle')
+                .style('dominant-baseline', 'central')
+                .style('pointer-events', 'none');
+
+            // Add tooltips
+            node.append('title')
+                .text(d => `${d.type}: ${d.title || d.name || d.id}${d.tags ? '\nTags: ' + d.tags.join(', ') : ''}`);
+
+            // Update positions on simulation tick
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+
+                node
+                    .attr('cx', d => d.x)
+                    .attr('cy', d => d.y);
+
+                label
+                    .attr('x', d => d.x)
+                    .attr('y', d => d.y + 20);
+            });
+
+            // Drag functions
+            function dragstarted(event) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                event.subject.fx = event.subject.x;
+                event.subject.fy = event.subject.y;
+            }
+
+            function dragged(event) {
+                event.subject.fx = event.x;
+                event.subject.fy = event.y;
+            }
+
+            function dragended(event) {
+                if (!event.active) simulation.alphaTarget(0);
+                event.subject.fx = null;
+                event.subject.fy = null;
+            }
+        }
+
+        // Initialize graph
+        async function init() {
+            try {
+                const data = await loadGraphData();
+                document.getElementById('loading').style.display = 'none';
+                createGraph(data);
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        // Start the application
+        init();
+    </script>
+</body>
+</html>
