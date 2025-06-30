@@ -30,7 +30,6 @@
                 quotes: [],
                 passages: [],
                 tags: [],
-                recent: []
             });
             const [loading, setLoading] = useState(false);
 
@@ -53,16 +52,15 @@
             // Load initial data
             useEffect(() => {
                 const loadInitialData = async () => {
-                    const [thoughts, topics, quotes, passages, tags, recent] = await Promise.all([
+                    const [thoughts, topics, quotes, passages, tags] = await Promise.all([
                         fetchData('thoughts'),
                         fetchData('topics'),
                         fetchData('quotes'),
                         fetchData('passages'),
-                        fetchData('tags'),
-                        fetchData('recent')
+                        fetchData('tags')
                     ]);
                     
-                    setData({ thoughts, topics, quotes, passages, tags, recent });
+                    setData({ thoughts, topics, quotes, passages, tags });
                 };
                 
                 loadInitialData();
@@ -122,7 +120,6 @@
                 { id: 'quotes', label: 'Quotes', icon: 'fas fa-quote-left', count: data.quotes?.length || 0 },
                 { id: 'passages', label: 'Bible', icon: 'fas fa-book', count: data.passages?.length || 0 },
                 { id: 'tags', label: 'Tags', icon: 'fas fa-tags', count: data.tags?.length || 0 },
-                { id: 'recent', label: 'Recent', icon: 'fas fa-clock', count: data.recent?.length || 0 },
                 { id: 'graph', label: 'Graph View', icon: 'fas fa-project-diagram', count: 0, isLink: true, url: '/graph/' }
             ];
 
@@ -205,8 +202,6 @@
                         return <ContentList items={data.passages} type="passage" />;
                     case 'tags':
                         return <TagsList tags={data.tags} />;
-                    case 'recent':
-                        return <ContentList items={data.recent} type="mixed" />;
                     case 'search':
                         return <ContentList items={data.searchResults || []} type="mixed" />;
                     default:

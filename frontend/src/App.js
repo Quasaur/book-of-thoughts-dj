@@ -67,7 +67,6 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }) => {
   const navigation = [
     { name: 'Start Here', id: 'start', icon: BookOpen },
     { name: 'Graph', id: 'graph', icon: Network },
-    { name: 'Recent', id: 'recent', icon: Clock },
     { name: 'Topics', id: 'topics', icon: BookOpen },
     { name: 'Thoughts', id: 'thoughts', icon: MessageSquare },
     { name: 'Quotes', id: 'quotes', icon: Quote },
@@ -204,14 +203,13 @@ const ContentArea = ({ activeView, searchResults, onItemClick, searchTerm }) => 
       try {
         let endpoint = '';
         switch (activeView) {
-          case 'start': endpoint = '/recent/'; break;
-          case 'recent': endpoint = '/recent/'; break;
+          case 'start': endpoint = '/topics/'; break;
           case 'topics': endpoint = '/topics/'; break;
           case 'thoughts': endpoint = '/thoughts/'; break;
           case 'quotes': endpoint = '/quotes/'; break;
           case 'passages': endpoint = '/passages/'; break;
           case 'tags': endpoint = '/tags/'; break;
-          default: endpoint = '/recent/';
+          default: endpoint = '/topics/';
         }
         
         const response = await api.get(`${endpoint}?page=${page}`);

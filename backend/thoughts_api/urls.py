@@ -2,7 +2,7 @@
 from django.urls import path
 from .views import (
     ThoughtsListView, TopicsListView, QuotesListView, PassagesListView,
-    ItemDetailView, SearchView, GraphDataView, TagsView, TagItemsView, RecentItemsView
+    ItemDetailView, SearchView, GraphDataView, TagsView, TagItemsView
 )
 
 urlpatterns = [
@@ -14,6 +14,5 @@ urlpatterns = [
     path('graph/', GraphDataView.as_view(), name='graph-data'),
     path('tags/', TagsView.as_view(), name='tags-list'),
     path('tags/<str:tag_name>/', TagItemsView.as_view(), name='tag-items'),
-    path('recent/', RecentItemsView.as_view(), name='recent-items'),
     path('<str:item_type>/<str:item_id>/', ItemDetailView.as_view(), name='item-detail'),
 ]
