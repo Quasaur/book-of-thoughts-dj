@@ -10,6 +10,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('thoughts_api.urls')),
     path('graph/', include('graph_app.urls')),
+    path('topics/', include('topics_app.urls')),
 ]
 
 # Serve static files in development

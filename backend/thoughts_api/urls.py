@@ -1,9 +1,10 @@
 # thoughts_api/urls.py
 from django.urls import path
 from .views import (
-    ThoughtsListView, TopicsListView, QuotesListView, PassagesListView,
+    ThoughtsListView, QuotesListView, PassagesListView,
     ItemDetailView, SearchView, GraphDataView, TagsView, TagItemsView
 )
+from topics_app.views import TopicsListView
 
 urlpatterns = [
     path('thoughts/', ThoughtsListView.as_view(), name='thoughts-list'),

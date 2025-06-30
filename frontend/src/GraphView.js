@@ -13,10 +13,22 @@ const GraphView = ({ api }) => {
     const fetchGraphData = async () => {
       try {
         setLoading(true);
-        const response = await api.get('/graph/');
-        setGraphData(response);
+        const response = await fetch('http://localhost:8000/graph/api/data/');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Graph data received:', data);
+        
+        if (!data.nodes || !data.links) {
+          throw new Error('Invalid graph data structure');
+        }
+        
+        setGraphData(data);
       } catch (err) {
-        setError('Failed to load graph data');
+        setError(`Failed to load graph data: ${err.message}`);
         console.error('Graph data fetch error:', err);
       } finally {
         setLoading(false);
@@ -82,7 +94,7 @@ const GraphView = ({ api }) => {
       .selectAll("text")
       .data(graphData.nodes)
       .join("text")
-      .text(d => d.name || d.title || d.id)
+      .text(d => d.title || d.name || d.id || 'Unknown')
       .style("font-size", "12px")
       .style("font-family", "Arial, sans-serif")
       .style("fill", "#333")
@@ -92,7 +104,7 @@ const GraphView = ({ api }) => {
 
     // Add tooltips
     node.append("title")
-      .text(d => `${d.type}: ${d.name || d.title || d.id}${d.tags ? `\nTags: ${d.tags.join(', ')}` : ''}`);
+      .text(d => `${d.type}: ${d.title || d.name || d.id || 'Unknown'}${d.tags ? `\nTags: ${d.tags.join(', ')}` : ''}`);
 
     // Update positions on simulation tick
     simulation.on("tick", () => {

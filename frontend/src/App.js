@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, BookOpen, MessageSquare, Quote, FileText, Tag, Clock, Network, Menu, X } from 'lucide-react';
 import StartHere from './StartHere';
+import GraphView from './GraphView';
 
 // API base URL
 const API_BASE_URL = 'http://localhost:8000/api';
@@ -68,6 +69,7 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }) => {
     { name: 'Start Here', id: 'start', icon: BookOpen },
     { name: 'Graph', id: 'graph', icon: Network },
     { name: 'Topics', id: 'topics', icon: BookOpen },
+    { name: 'Topics View', id: 'topics-view', icon: BookOpen, isExternal: true, url: 'http://localhost:8000/topics/' },
     { name: 'Thoughts', id: 'thoughts', icon: MessageSquare },
     { name: 'Quotes', id: 'quotes', icon: Quote },
     { name: 'Passages', id: 'passages', icon: FileText },
@@ -97,7 +99,11 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }) => {
               <button
                 key={item.id}
                 onClick={() => {
-                  onViewChange(item.id);
+                  if (item.isExternal && item.url) {
+                    window.open(item.url, '_blank');
+                  } else {
+                    onViewChange(item.id);
+                  }
                   onClose();
                 }}
                 className={`w-full flex items-center px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
@@ -182,7 +188,7 @@ const ErrorMessage = ({ message }) => (
 );
 
 // Main Content Area
-const ContentArea = ({ activeView, searchResults, onItemClick, searchTerm }) => {
+const ContentArea = ({ activeView, searchResults, onItemClick, searchTerm, onViewChange }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -227,9 +233,12 @@ const ContentArea = ({ activeView, searchResults, onItemClick, searchTerm }) => 
 
   const renderContent = () => {
     if (activeView === 'start') {
-      return <StartHere onViewChange={handleViewChange} />;
+      return <StartHere onViewChange={onViewChange} />;
     }
     
+    if (activeView === 'graph') {
+      return <GraphView api={api} />;
+    }
     
     if (loading) return <Loading />;
     if (error) return <ErrorMessage message={error} />;
@@ -379,10 +388,6 @@ export default function BookOfThoughtsApp() {
   };
 
   const handleViewChange = (view) => {
-    if (view === 'graph') {
-      window.open('http://localhost:8000/graph/', '_blank');
-      return;
-    }
     setActiveView(view);
     if (view !== 'search') {
       setSearchResults(null);
@@ -416,6 +421,7 @@ export default function BookOfThoughtsApp() {
           searchResults={searchResults}
           onItemClick={handleItemClick}
           searchTerm={searchTerm}
+          onViewChange={handleViewChange}
         />
       </div>
       

@@ -30,28 +30,6 @@ class ThoughtsListView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-class TopicsListView(APIView):
-    """API view for listing topics"""
-    
-    def get(self, request):
-        try:
-            page = int(request.GET.get('page', 1))
-            page_size = int(request.GET.get('page_size', 20))
-            skip = (page - 1) * page_size
-            
-            topics = neo4j_service.get_all_topics(skip=skip, limit=page_size)
-            
-            return Response({
-                'results': topics,
-                'page': page,
-                'page_size': page_size
-            })
-        except Exception as e:
-            logger.error(f"Error fetching topics: {e}")
-            return Response(
-                {'error': 'Failed to fetch topics'}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
 
 class QuotesListView(APIView):
     """API view for listing quotes"""

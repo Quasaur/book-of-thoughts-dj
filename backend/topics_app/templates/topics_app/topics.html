@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topics - Book of Thoughts</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .breadcrumb {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .back-link:hover {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        .main-content {
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 200px);
+        }
+        .topics-table-card {
+            flex: 3;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .topic-detail-card {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            background-color: #f8f9fa;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        .card-content {
+            flex: 1;
+            overflow: auto;
+            padding: 0;
+        }
+        .controls {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f8f9fa;
+        }
+        .search-box {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 300px;
+        }
+        .info {
+            font-size: 14px;
+            color: #666;
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #d32f2f;
+        }
+        .topics-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .topics-table th,
+        .topics-table td {
+            padding: 12px 20px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .topics-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .topics-table tr {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .topics-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        .topics-table tr.selected {
+            background-color: #e3f2fd;
+        }
+        .topic-title {
+            font-weight: 600;
+            color: #333;
+        }
+        .topic-description {
+            color: #666;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .topic-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .tag {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+        .topic-detail-content {
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .detail-section {
+            margin-bottom: 25px;
+        }
+        .detail-section h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 16px;
+            border-bottom: 2px solid #8B5CF6;
+            padding-bottom: 5px;
+        }
+        .detail-section p {
+            margin: 0 0 10px 0;
+            color: #666;
+        }
+        .detail-meta {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .detail-meta-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .detail-meta-item:last-child {
+            margin-bottom: 0;
+        }
+        .detail-meta-label {
+            font-weight: 600;
+            color: #333;
+        }
+        .detail-meta-value {
+            color: #666;
+        }
+        .no-selection {
+            text-align: center;
+            color: #999;
+            padding: 50px 20px;
+            font-style: italic;
+        }
+        .pagination {
+            padding: 15px 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            background-color: #f8f9fa;
+        }
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+        .page-btn:hover {
+            background: #f0f0f0;
+        }
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .description-node {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .description-node h4 {
+            margin: 0 0 10px 0;
+            color: #856404;
+            font-size: 14px;
+        }
+        .description-node p {
+            margin: 0;
+            color: #856404;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <nav class="breadcrumb">
+                <a href="/" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Main Site
+                </a>
+            </nav>
+            <h1>Topics</h1>
+            <p>Browse and explore all topics in the knowledge base</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- Topics Table Card (3/4 width) -->
+            <div class="topics-table-card">
+                <div class="card-header">
+                    <h2 class="card-title">Topics Table</h2>
+                </div>
+                
+                <div class="controls">
+                    <div class="info">
+                        <span id="topic-count">Loading...</span> topics found
+                    </div>
+                    <input type="text" class="search-box" id="search-input" placeholder="Search topics...">
+                </div>
+                
+                <div class="card-content">
+                    <div id="loading" class="loading">Loading topics...</div>
+                    <div id="error" class="error" style="display: none;">Failed to load topics</div>
+                    <div id="topics-table-container" style="display: none;">
+                        <table class="topics-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Tags</th>
+                                    <th>Last Modified</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topics-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="pagination" class="pagination" style="display: none;"></div>
+            </div>
+            
+            <!-- Topic Detail Card (1/4 width) -->
+            <div class="topic-detail-card">
+                <div class="card-header">
+                    <h2 class="card-title">Topic Detail</h2>
+                </div>
+                
+                <div class="card-content">
+                    <div id="topic-detail-content" class="no-selection">
+                        <i class="fas fa-mouse-pointer" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
+                        <p>Click on a topic in the table to view its details</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let pageSize = 20;
+        let searchTerm = '';
+        let allTopics = [];
+        let selectedTopicId = null;
+
+        async function loadTopics(page = 1, search = '') {
+            try {
+                const params = new URLSearchParams({
+                    page: page,
+                    page_size: pageSize
+                });
+                
+                if (search) {
+                    params.append('search', search);
+                }
+                
+                const response = await fetch(`/topics/api/data/?${params}`);
+                if (!response.ok) throw new Error('Failed to fetch topics');
+                return await response.json();
+            } catch (error) {
+                console.error('Error loading topics:', error);
+                throw error;
+            }
+        }
+
+        async function loadTopicDetail(topicId) {
+            try {
+                const response = await fetch(`/topics/api/detail/${topicId}/`);
+                if (!response.ok) throw new Error('Failed to fetch topic detail');
+                return await response.json();
+            } catch (error) {
+                console.error('Error loading topic detail:', error);
+                throw error;
+            }
+        }
+
+        function createTopicRow(topic) {
+            const row = document.createElement('tr');
+            row.onclick = () => selectTopic(topic);
+            row.dataset.topicId = topic.id;
+            
+            const tagsHtml = topic.tags && topic.tags.length > 0 
+                ? topic.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')
+                : '<span style="color: #999;">No tags</span>';
+            
+            const lastModified = topic.last_modified 
+                ? new Date(topic.last_modified).toLocaleDateString()
+                : 'Unknown';
+                
+            row.innerHTML = `
+                <td class="topic-title">${topic.title || topic.name || 'Untitled Topic'}</td>
+                <td class="topic-description">${topic.description || topic.content || 'No description available'}</td>
+                <td class="topic-tags">${tagsHtml}</td>
+                <td>${lastModified}</td>
+            `;
+            
+            return row;
+        }
+
+        function displayTopics(data) {
+            const tableBody = document.getElementById('topics-table-body');
+            tableBody.innerHTML = '';
+            
+            if (!data.results || data.results.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="4" style="text-align: center; color: #999; padding: 40px;">No topics found</td>';
+                tableBody.appendChild(row);
+                return;
+            }
+            
+            data.results.forEach(topic => {
+                tableBody.appendChild(createTopicRow(topic));
+            });
+            
+            document.getElementById('topic-count').textContent = data.results.length;
+            updatePagination(data);
+        }
+
+        async function selectTopic(topic) {
+            // Remove previous selection
+            document.querySelectorAll('.topics-table tr').forEach(row => {
+                row.classList.remove('selected');
+            });
+            
+            // Add selection to current row
+            const currentRow = document.querySelector(`tr[data-topic-id="${topic.id}"]`);
+            if (currentRow) {
+                currentRow.classList.add('selected');
+            }
+            
+            selectedTopicId = topic.id;
+            
+            // Show loading in detail panel
+            const detailContent = document.getElementById('topic-detail-content');
+            detailContent.innerHTML = '<div class="loading">Loading topic details...</div>';
+            
+            try {
+                const topicDetail = await loadTopicDetail(topic.id);
+                displayTopicDetail(topicDetail);
+            } catch (error) {
+                detailContent.innerHTML = '<div class="error">Failed to load topic details</div>';
+            }
+        }
+
+        function displayTopicDetail(topic) {
+            const detailContent = document.getElementById('topic-detail-content');
+            
+            const tagsHtml = topic.tags && topic.tags.length > 0 
+                ? `<div class="topic-tags">${topic.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}</div>`
+                : '';
+            
+            const lastModified = topic.last_modified 
+                ? new Date(topic.last_modified).toLocaleDateString()
+                : 'Unknown';
+                
+            const descriptionNodeHtml = topic.description_node && topic.description_node.content
+                ? `<div class="description-node">
+                     <h4><i class="fas fa-info-circle"></i> Description Node</h4>
+                     <p>${topic.description_node.content}</p>
+                   </div>`
+                : '';
+                
+            detailContent.innerHTML = `
+                <div class="topic-detail-content">
+                    <div class="detail-section">
+                        <h3>${topic.title || topic.name || 'Untitled Topic'}</h3>
+                        ${tagsHtml}
+                    </div>
+                    
+                    <div class="detail-meta">
+                        <div class="detail-meta-item">
+                            <span class="detail-meta-label">ID:</span>
+                            <span class="detail-meta-value">${topic.id}</span>
+                        </div>
+                        <div class="detail-meta-item">
+                            <span class="detail-meta-label">Type:</span>
+                            <span class="detail-meta-value">Topic</span>
+                        </div>
+                        <div class="detail-meta-item">
+                            <span class="detail-meta-label">Last Modified:</span>
+                            <span class="detail-meta-value">${lastModified}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3>Description</h3>
+                        <p>${topic.description || topic.content || 'No description available'}</p>
+                    </div>
+                    
+                    ${descriptionNodeHtml}
+                </div>
+            `;
+        }
+
+        function updatePagination(data) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+            
+            if (data.results.length < pageSize) {
+                pagination.style.display = 'none';
+                return;
+            }
+            
+            pagination.style.display = 'flex';
+            
+            // Previous button
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'page-btn';
+            prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i> Previous';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.onclick = () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadAndDisplayTopics();
+                }
+            };
+            pagination.appendChild(prevBtn);
+            
+            // Page number
+            const pageInfo = document.createElement('span');
+            pageInfo.textContent = `Page ${currentPage}`;
+            pagination.appendChild(pageInfo);
+            
+            // Next button
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'page-btn';
+            nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+            nextBtn.disabled = data.results.length < pageSize;
+            nextBtn.onclick = () => {
+                currentPage++;
+                loadAndDisplayTopics();
+            };
+            pagination.appendChild(nextBtn);
+        }
+
+        async function loadAndDisplayTopics() {
+            try {
+                const data = await loadTopics(currentPage, searchTerm);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('topics-table-container').style.display = 'block';
+                displayTopics(data);
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        // Search functionality
+        const searchInput = document.getElementById('search-input');
+        let searchTimeout;
+        
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchTerm = e.target.value;
+                currentPage = 1;
+                loadAndDisplayTopics();
+            }, 300);
+        });
+
+        // Initialize
+        loadAndDisplayTopics();
+    </script>
+</body>
+</html>
