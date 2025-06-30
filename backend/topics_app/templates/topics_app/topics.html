@@ -49,7 +49,7 @@
             height: calc(100vh - 200px);
         }
         .topics-table-card {
-            flex: 3;
+            width: 75%;
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -58,7 +58,7 @@
             overflow: hidden;
         }
         .topic-detail-card {
-            flex: 1;
+            width: 25%;
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -138,16 +138,26 @@
         .topics-table tr.selected {
             background-color: #e3f2fd;
         }
-        .topic-title {
+        .topic-name {
             font-weight: 600;
             color: #333;
+            font-family: monospace;
+            font-size: 12px;
         }
-        .topic-description {
+        .topic-alias {
+            color: #333;
+            font-weight: 500;
+            font-size: 12px;
+        }
+        .topic-parent {
             color: #666;
-            max-width: 300px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .topic-level {
+            color: #666;
+            text-align: center;
+            font-weight: 600;
         }
         .topic-tags {
             display: flex;
@@ -159,7 +169,7 @@
             color: #1565c0;
             padding: 2px 6px;
             border-radius: 10px;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 500;
         }
         .topic-detail-content {
@@ -286,10 +296,11 @@
                         <table class="topics-table">
                             <thead>
                                 <tr>
-                                    <th>Title</th>
-                                    <th>Description</th>
+                                    <th>Name</th>
+                                    <th>Alias</th>
+                                    <th>Parent</th>
+                                    <th>Level</th>
                                     <th>Tags</th>
-                                    <th>Last Modified</th>
                                 </tr>
                             </thead>
                             <tbody id="topics-table-body">
@@ -363,16 +374,13 @@
             const tagsHtml = topic.tags && topic.tags.length > 0 
                 ? topic.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')
                 : '<span style="color: #999;">No tags</span>';
-            
-            const lastModified = topic.last_modified 
-                ? new Date(topic.last_modified).toLocaleDateString()
-                : 'Unknown';
                 
             row.innerHTML = `
-                <td class="topic-title">${topic.title || topic.name || 'Untitled Topic'}</td>
-                <td class="topic-description">${topic.description || topic.content || 'No description available'}</td>
+                <td class="topic-name">${topic.name || 'Unknown'}</td>
+                <td class="topic-alias">${topic.alias || 'No alias'}</td>
+                <td class="topic-parent">${topic.parent || 'None'}</td>
+                <td class="topic-level">${topic.level !== null ? topic.level : 'N/A'}</td>
                 <td class="topic-tags">${tagsHtml}</td>
-                <td>${lastModified}</td>
             `;
             
             return row;
@@ -384,7 +392,7 @@
             
             if (!data.results || data.results.length === 0) {
                 const row = document.createElement('tr');
-                row.innerHTML = '<td colspan="4" style="text-align: center; color: #999; padding: 40px;">No topics found</td>';
+                row.innerHTML = '<td colspan="5" style="text-align: center; color: #999; padding: 40px;">No topics found</td>';
                 tableBody.appendChild(row);
                 return;
             }
@@ -429,10 +437,13 @@
             const tagsHtml = topic.tags && topic.tags.length > 0 
                 ? `<div class="topic-tags">${topic.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}</div>`
                 : '';
-            
-            const lastModified = topic.last_modified 
-                ? new Date(topic.last_modified).toLocaleDateString()
-                : 'Unknown';
+                
+            const notesHtml = topic.notes
+                ? `<div class="detail-section">
+                     <h3>Notes</h3>
+                     <p>${topic.notes}</p>
+                   </div>`
+                : '';
                 
             const descriptionNodeHtml = topic.description_node && topic.description_node.content
                 ? `<div class="description-node">
@@ -444,29 +455,26 @@
             detailContent.innerHTML = `
                 <div class="topic-detail-content">
                     <div class="detail-section">
-                        <h3>${topic.title || topic.name || 'Untitled Topic'}</h3>
+                        <h3>${topic.alias || topic.name || 'Untitled Topic'}</h3>
                         ${tagsHtml}
                     </div>
                     
                     <div class="detail-meta">
                         <div class="detail-meta-item">
-                            <span class="detail-meta-label">ID:</span>
-                            <span class="detail-meta-value">${topic.id}</span>
+                            <span class="detail-meta-label">Name:</span>
+                            <span class="detail-meta-value">${topic.name || topic.id}</span>
                         </div>
                         <div class="detail-meta-item">
-                            <span class="detail-meta-label">Type:</span>
-                            <span class="detail-meta-value">Topic</span>
+                            <span class="detail-meta-label">Parent:</span>
+                            <span class="detail-meta-value">${topic.parent || 'None'}</span>
                         </div>
                         <div class="detail-meta-item">
-                            <span class="detail-meta-label">Last Modified:</span>
-                            <span class="detail-meta-value">${lastModified}</span>
+                            <span class="detail-meta-label">Level:</span>
+                            <span class="detail-meta-value">${topic.level !== null ? topic.level : 'N/A'}</span>
                         </div>
                     </div>
                     
-                    <div class="detail-section">
-                        <h3>Description</h3>
-                        <p>${topic.description || topic.content || 'No description available'}</p>
-                    </div>
+                    ${notesHtml}
                     
                     ${descriptionNodeHtml}
                 </div>

@@ -47,7 +47,7 @@ class Neo4jService:
                count(DISTINCT thought) as thought_count,
                t.tags as tags,
                desc.en_content as en_description
-        ORDER BY t.name ASC
+        ORDER BY t.level ASC, t.name ASC
         SKIP $skip LIMIT $limit
         """
         return self.run_query(query, {"skip": skip, "limit": limit})
