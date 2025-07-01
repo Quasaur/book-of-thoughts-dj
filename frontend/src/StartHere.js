@@ -8,7 +8,7 @@ const StartHere = ({ onViewChange }) => {
       title: "Topics",
       description: "Explore organized thoughts and ideas by topic",
       color: "bg-purple-100 text-purple-800 border-purple-300",
-      action: () => onViewChange('topics')
+      action: () => window.location.href = 'http://localhost:8000/topics/'
     },
     {
       icon: MessageSquare,
@@ -66,7 +66,7 @@ const StartHere = ({ onViewChange }) => {
             Explore Graph
           </button>
           <button
-            onClick={() => onViewChange('topics')}
+            onClick={() => window.location.href = 'http://localhost:8000/topics/'}
             className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-medium transition-colors"
           >
             Browse Topics

@@ -99,6 +99,7 @@
                         data={data}
                         loading={loading}
                         sidebarExpanded={sidebarExpanded}
+                        setActiveSection={setActiveSection}
                     />
                 </div>
             );
@@ -115,13 +116,12 @@
 
             const sections = [
                 { id: 'start', label: 'Start Here', icon: 'fas fa-home', count: 0 },
-                { id: 'thoughts', label: 'Thoughts', icon: 'fas fa-lightbulb', count: data.thoughts?.length || 0 },
-                { id: 'topics', label: 'Topics', icon: 'fas fa-folder', count: data.topics?.length || 0 },
+                { id: 'graph', label: 'Graph View', icon: 'fas fa-project-diagram', count: 0, isLink: true, url: '/graph/' },
                 { id: 'topics-view', label: 'Topics View', icon: 'fas fa-th-large', count: 0, isLink: true, url: '/topics/' },
+                { id: 'thoughts', label: 'Thoughts', icon: 'fas fa-lightbulb', count: data.thoughts?.length || 0 },
                 { id: 'quotes', label: 'Quotes', icon: 'fas fa-quote-left', count: data.quotes?.length || 0 },
                 { id: 'passages', label: 'Bible', icon: 'fas fa-book', count: data.passages?.length || 0 },
-                { id: 'tags', label: 'Tags', icon: 'fas fa-tags', count: data.tags?.length || 0 },
-                { id: 'graph', label: 'Graph View', icon: 'fas fa-project-diagram', count: 0, isLink: true, url: '/graph/' }
+                { id: 'tags', label: 'Tags', icon: 'fas fa-tags', count: data.tags?.length || 0 }
             ];
 
             return (
@@ -184,7 +184,7 @@
         }
 
         // Main Content Component
-        function MainContent({ activeSection, data, loading, sidebarExpanded }) {
+        function MainContent({ activeSection, data, loading, sidebarExpanded, setActiveSection }) {
             const renderContent = () => {
                 if (loading) {
                     return <div className="loading">Loading...</div>;
@@ -195,8 +195,6 @@
                         return <StartHereView setActiveSection={setActiveSection} />;
                     case 'thoughts':
                         return <ContentList items={data.thoughts} type="thought" />;
-                    case 'topics':
-                        return <ContentList items={data.topics} type="topic" />;
                     case 'quotes':
                         return <ContentList items={data.quotes} type="quote" />;
                     case 'passages':

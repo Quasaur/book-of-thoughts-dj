@@ -11,15 +11,17 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #111827;
+            color: #f9fafb;
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background-color: white;
+            background-color: #1f2937;
             border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            border: 1px solid #374151;
         }
         .header {
             text-align: center;
@@ -33,7 +35,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            color: #666;
+            color: #9ca3af;
             text-decoration: none;
             font-size: 14px;
             padding: 8px 12px;
@@ -41,13 +43,14 @@
             transition: all 0.2s ease;
         }
         .back-link:hover {
-            background-color: #f0f0f0;
-            color: #333;
+            background-color: #374151;
+            color: #f9fafb;
         }
         .graph-container {
-            border: 1px solid #ddd;
+            border: 1px solid #374151;
             border-radius: 4px;
             overflow: hidden;
+            background-color: #374151;
         }
         .controls {
             margin-bottom: 15px;
@@ -72,12 +75,12 @@
         }
         .info {
             font-size: 14px;
-            color: #666;
+            color: #d1d5db;
         }
         .loading {
             text-align: center;
             padding: 50px;
-            color: #666;
+            color: #d1d5db;
         }
         .error {
             text-align: center;
@@ -216,7 +219,7 @@
                 .text(d => d.title || d.name || d.id)
                 .style('font-size', '10px')
                 .style('font-family', 'Arial, sans-serif')
-                .style('fill', '#333')
+                .style('fill', '#f9fafb')
                 .style('text-anchor', 'middle')
                 .style('dominant-baseline', 'central')
                 .style('pointer-events', 'none');
