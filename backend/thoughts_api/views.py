@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
+from django.shortcuts import render
 from .neo4j_service import neo4j_service
 import logging
 
@@ -205,4 +206,14 @@ class TagItemsView(APIView):
                 {'error': 'Failed to fetch items by tag'}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+def topics_table_view(request):
+    """Render a table view of all topics"""
+    try:
+        # Get all topics from Neo4j
+        topics = neo4j_service.get_all_topics()
+        return render(request, 'thoughts_api/topics_table.html', {'topics': topics})
+    except Exception as e:
+        logger.error(f"Error fetching topics for table view: {e}")
+        return render(request, 'thoughts_api/topics_table.html', {'topics': [], 'error': str(e)})
 

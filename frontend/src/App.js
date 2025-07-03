@@ -49,7 +49,7 @@ const Header = ({ onMenuToggle, searchTerm, onSearchChange, onSearch }) => (
           <div className="relative">
             <input
               type="text"
-              placeholder="Search thoughts, topics, quotes..."
+              placeholder="Search thoughts, quotes, passages..."
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
@@ -67,8 +67,7 @@ const Header = ({ onMenuToggle, searchTerm, onSearchChange, onSearch }) => (
 const Sidebar = ({ isOpen, onClose, activeView, onViewChange }) => {
   const navigation = [
     { name: 'Start Here', id: 'start', icon: BookOpen },
-    { name: 'Graph', id: 'graph', icon: Network },
-    { name: 'Topics', id: 'topics', icon: BookOpen },
+    { name: 'Graph View', id: 'graph', icon: Network },
     { name: 'Topics View', id: 'topics-view', icon: BookOpen, isExternal: true, url: 'http://localhost:8000/topics/' },
     { name: 'Thoughts', id: 'thoughts', icon: MessageSquare },
     { name: 'Quotes', id: 'quotes', icon: Quote },
@@ -209,13 +208,12 @@ const ContentArea = ({ activeView, searchResults, onItemClick, searchTerm, onVie
       try {
         let endpoint = '';
         switch (activeView) {
-          case 'start': endpoint = '/topics/'; break;
-          case 'topics': endpoint = '/topics/'; break;
+          case 'start': endpoint = '/thoughts/'; break;
           case 'thoughts': endpoint = '/thoughts/'; break;
           case 'quotes': endpoint = '/quotes/'; break;
           case 'passages': endpoint = '/passages/'; break;
           case 'tags': endpoint = '/tags/'; break;
-          default: endpoint = '/topics/';
+          default: endpoint = '/thoughts/';
         }
         
         const response = await api.get(`${endpoint}?page=${page}`);

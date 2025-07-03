@@ -2,13 +2,11 @@
 from django.urls import path
 from .views import (
     ThoughtsListView, QuotesListView, PassagesListView,
-    ItemDetailView, SearchView, GraphDataView, TagsView, TagItemsView
+    ItemDetailView, SearchView, GraphDataView, TagsView, TagItemsView, topics_table_view
 )
-from topics_app.views import TopicsListView
 
 urlpatterns = [
     path('thoughts/', ThoughtsListView.as_view(), name='thoughts-list'),
-    path('topics/', TopicsListView.as_view(), name='topics-list'),
     path('quotes/', QuotesListView.as_view(), name='quotes-list'),
     path('passages/', PassagesListView.as_view(), name='passages-list'),
     path('search/', SearchView.as_view(), name='search'),

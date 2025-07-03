@@ -4,13 +4,6 @@ import { BookOpen, Network, Tag, FileText, Quote, MessageSquare, Search } from '
 const StartHere = ({ onViewChange }) => {
   const features = [
     {
-      icon: BookOpen,
-      title: "Topics",
-      description: "Explore organized thoughts and ideas by topic",
-      color: "bg-purple-100 text-purple-800 border-purple-300",
-      action: () => window.location.href = 'http://localhost:8000/topics/'
-    },
-    {
       icon: MessageSquare,
       title: "Thoughts",
       description: "Personal insights and reflections",
@@ -66,10 +59,10 @@ const StartHere = ({ onViewChange }) => {
             Explore Graph
           </button>
           <button
-            onClick={() => window.location.href = 'http://localhost:8000/topics/'}
+            onClick={() => onViewChange('thoughts')}
             className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-medium transition-colors"
           >
-            Browse Topics
+            Browse Thoughts
           </button>
         </div>
       </div>
@@ -103,7 +96,7 @@ const StartHere = ({ onViewChange }) => {
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">The Tables</h3>
             <p className="text-gray-600 mb-4">
-              Organized collections of thoughts, quotes, and passages structured by topics and themes.
+              Organized collections of thoughts, quotes, and passages structured by themes and categories.
             </p>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">The Tags</h3>
             <p className="text-gray-600">
@@ -113,7 +106,7 @@ const StartHere = ({ onViewChange }) => {
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Graph Visualization</h3>
             <p className="text-gray-600 mb-4">
-              Interactive network showing relationships between ideas, topics, and content.
+              Interactive network showing relationships between ideas, themes, and content.
             </p>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Search & Discovery</h3>
             <p className="text-gray-600">
@@ -131,8 +124,8 @@ const StartHere = ({ onViewChange }) => {
             <div className="bg-blue-100 rounded-full p-3 w-12 h-12 mx-auto mb-3 flex items-center justify-center">
               <span className="text-blue-600 font-bold">1</span>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Start with Topics</h3>
-            <p className="text-gray-600 text-sm">Browse the main topics to get an overview of the content structure.</p>
+            <h3 className="font-semibold text-gray-900 mb-2">Start with Thoughts</h3>
+            <p className="text-gray-600 text-sm">Browse your thoughts to get an overview of the content structure.</p>
           </div>
           <div className="text-center">
             <div className="bg-blue-100 rounded-full p-3 w-12 h-12 mx-auto mb-3 flex items-center justify-center">

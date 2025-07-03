@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topics Table View - Book of Thoughts</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .header h1 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .stats {
+            margin-top: 10px;
+            color: #666;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .topic-title {
+            font-weight: 500;
+            color: #2563eb;
+        }
+        
+        .topic-description {
+            color: #666;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .tag {
+            display: inline-block;
+            background: #e5e7eb;
+            color: #374151;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-right: 4px;
+        }
+        
+        .error {
+            color: #dc2626;
+            background-color: #fee2e2;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .date {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .breadcrumb {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            border: 1px solid #ddd;
+        }
+        
+        .back-link:hover {
+            background-color: #f3f4f6;
+            color: #333;
+            border-color: #999;
+        }
+        
+        .page-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 168px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar h2 {
+            padding: 0 20px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background-color: #f9fafb;
+            color: #333;
+            border-left-color: #3b82f6;
+        }
+        
+        .nav-item.active {
+            background-color: #eff6ff;
+            color: #2563eb;
+            border-left-color: #2563eb;
+            font-weight: 500;
+        }
+        
+        .main-content {
+            margin-left: 168px;
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: none;
+            margin: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="page-layout">
+        <nav class="sidebar">
+            <h2>Book of Thoughts</h2>
+            <a href="http://localhost:3000/" class="nav-item">Start Here</a>
+            <a href="http://localhost:8000/graph/" class="nav-item">Graph View</a>
+            <a href="http://localhost:8000/topics/" class="nav-item active">Topics View</a>
+            <a href="http://localhost:3000/" class="nav-item" onclick="window.opener?.postMessage({type: 'navigate', view: 'thoughts'}, 'http://localhost:3000'); return false;">Thoughts</a>
+            <a href="http://localhost:3000/" class="nav-item" onclick="window.opener?.postMessage({type: 'navigate', view: 'quotes'}, 'http://localhost:3000'); return false;">Quotes</a>
+            <a href="http://localhost:3000/" class="nav-item" onclick="window.opener?.postMessage({type: 'navigate', view: 'passages'}, 'http://localhost:3000'); return false;">Passages</a>
+            <a href="http://localhost:3000/" class="nav-item" onclick="window.opener?.postMessage({type: 'navigate', view: 'tags'}, 'http://localhost:3000'); return false;">Tags</a>
+        </nav>
+        
+        <div class="main-content">
+            <div class="container">
+                <div class="header">
+                    <nav class="breadcrumb">
+                        <a href="http://localhost:3000/" class="back-link">
+                            ← Back to Home
+                        </a>
+                    </nav>
+                    <h1>Topics Overview</h1>
+                    {% if topics %}
+                        <div class="stats">{{ topics|length }} topic(s) found</div>
+                    {% endif %}
+                </div>
+        
+        {% if error %}
+            <div class="error">
+                <strong>Error:</strong> {{ error }}
+            </div>
+        {% elif not topics %}
+            <div class="empty-state">
+                <h3>No topics found</h3>
+                <p>Topics will appear here once they are created in the system.</p>
+            </div>
+        {% else %}
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Tags</th>
+                            <th>Created</th>
+                            <th>Last Modified</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for topic in topics %}
+                            <tr>
+                                <td class="topic-title">{{ topic.title|default:"Untitled" }}</td>
+                                <td class="topic-description">{{ topic.description|default:"No description" }}</td>
+                                <td>
+                                    {% if topic.tags %}
+                                        {% for tag in topic.tags %}
+                                            <span class="tag">#{{ tag }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="tag">No tags</span>
+                                    {% endif %}
+                                </td>
+                                <td class="date">{{ topic.created_at|default:"N/A" }}</td>
+                                <td class="date">{{ topic.last_modified|default:"N/A" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
