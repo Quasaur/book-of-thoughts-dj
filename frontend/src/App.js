@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Search, BookOpen, MessageSquare, Quote, FileText, Tag, Clock, Network, Menu, X } from 'lucide-react';
+import { Search, BookOpen, MessageSquare, Quote, FileText, Tag, Clock, Network, Menu, X, TreePine } from 'lucide-react';
 import StartHere from './StartHere';
 import GraphView from './GraphView';
+import TopicsView from './TopicsView';
 
 // API base URL
 const API_BASE_URL = 'http://localhost:8000/api';
@@ -68,7 +69,7 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }) => {
   const navigation = [
     { name: 'Start Here', id: 'start', icon: BookOpen },
     { name: 'Graph View', id: 'graph', icon: Network },
-    { name: 'Topics View', id: 'topics-view', icon: BookOpen, isExternal: true, url: 'http://localhost:8000/topics/' },
+    { name: 'Topics', id: 'topics', icon: TreePine },
     { name: 'Thoughts', id: 'thoughts', icon: MessageSquare },
     { name: 'Quotes', id: 'quotes', icon: Quote },
     { name: 'Passages', id: 'passages', icon: FileText },
@@ -200,7 +201,7 @@ const ContentArea = ({ activeView, searchResults, onItemClick, searchTerm, onVie
     }
 
     const fetchData = async () => {
-      if (activeView === 'graph' || activeView === 'start') return; // Graph and Start views handled separately
+      if (activeView === 'graph' || activeView === 'start' || activeView === 'topics') return; // These views are handled separately
       
       setLoading(true);
       setError(null);
@@ -236,6 +237,10 @@ const ContentArea = ({ activeView, searchResults, onItemClick, searchTerm, onVie
     
     if (activeView === 'graph') {
       return <GraphView api={api} />;
+    }
+    
+    if (activeView === 'topics') {
+      return <TopicsView api={api} />;
     }
     
     if (loading) return <Loading />;
@@ -362,7 +367,16 @@ const ItemDetailModal = ({ item, onClose }) => {
 
 // Main App Component
 export default function BookOfThoughtsApp() {
-  const [activeView, setActiveView] = useState('start');
+  // Check URL parameters for initial view
+  const getInitialView = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewParam = urlParams.get('view');
+    return viewParam && ['start', 'graph', 'topics', 'thoughts', 'quotes', 'passages', 'tags'].includes(viewParam) 
+      ? viewParam 
+      : 'start';
+  };
+  
+  const [activeView, setActiveView] = useState(getInitialView());
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState(null);
@@ -391,6 +405,11 @@ export default function BookOfThoughtsApp() {
       setSearchResults(null);
       setSearchTerm('');
     }
+    
+    // Update URL to reflect current view
+    const url = new URL(window.location);
+    url.searchParams.set('view', view);
+    window.history.pushState({}, '', url);
   };
 
   const handleItemClick = (item) => {

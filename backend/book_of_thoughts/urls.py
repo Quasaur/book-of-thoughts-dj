@@ -11,7 +11,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('thoughts_api.urls')),
     path('graph/', include('graph_app.urls')),
-    path('topics/', topics_table_view, name='topics-table'),
+    path('topics/', include('topics.urls')),
+    # Backwards compatibility
+    path('topics-old/', topics_table_view, name='topics-table-old'),
 ]
 
 # Serve static files in development

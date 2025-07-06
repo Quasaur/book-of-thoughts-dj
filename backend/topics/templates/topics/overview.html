@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topics Overview - Book of Thoughts</title>
+    <style>
+        /* Enhanced styling for M1 MacBook Safari optimization */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+        
+        .header {
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px 20px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .stat-number {
+            font-size: 1.8em;
+            font-weight: 700;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .filter-select {
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            min-width: 150px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: top;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+            transition: background-color 0.2s ease;
+        }
+        
+        .topic-title {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+        
+        .topic-title a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .topic-title a:hover {
+            color: #764ba2;
+        }
+        
+        .topic-description {
+            color: #718096;
+            line-height: 1.5;
+            max-width: 400px;
+        }
+        
+        .level-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .tag {
+            display: inline-block;
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 12px;
+            margin: 2px 4px 2px 0;
+            font-weight: 500;
+        }
+        
+        .tag:hover {
+            background: #cbd5e0;
+            transition: background-color 0.2s ease;
+        }
+        
+        .error {
+            color: #e53e3e;
+            background: #fed7d7;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 30px;
+            border-left: 4px solid #e53e3e;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            color: #718096;
+        }
+        
+        .empty-state h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .pagination {
+            padding: 20px 30px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            background: #f8f9fa;
+        }
+        
+        .pagination a,
+        .pagination span {
+            padding: 8px 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.2s ease;
+        }
+        
+        .pagination a:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .pagination .current {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .level-stats {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .level-stat {
+            background: rgba(255,255,255,0.15);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        /* Responsive design for M1 MacBook screens */
+        @media (max-width: 1200px) {
+            .container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: auto;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .stats {
+                gap: 15px;
+            }
+            
+            .stat-item {
+                flex: 1;
+                min-width: 120px;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            th, td {
+                padding: 12px 8px;
+            }
+        }
+        
+        /* Navigation Sidebar */
+        .nav-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 16rem; /* 256px - matches React w-64 */
+            background: white;
+            color: #374151; /* gray-700 */
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* matches shadow-lg */
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            border-right: 1px solid #e5e7eb; /* gray-200 border */
+        }
+        
+        .nav-sidebar.open {
+            transform: translateX(0);
+        }
+        
+        .nav-header {
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+        }
+        
+        .nav-header h2 {
+            margin: 0;
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600;
+            color: #111827; /* gray-900 */
+        }
+        
+        .nav-menu {
+            padding: 10px 0;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 12px 16px;
+            color: #6b7280; /* gray-500 */
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-right: 2px solid transparent;
+            margin: 0 4px;
+            border-radius: 6px;
+        }
+        
+        .nav-item:hover {
+            background: #f3f4f6; /* gray-100 */
+            color: #374151; /* gray-700 */
+        }
+        
+        .nav-item.active {
+            background: #dbeafe; /* blue-50 */
+            color: #1d4ed8; /* blue-700 */
+            border-right-color: #1d4ed8; /* blue-700 */
+        }
+        
+        .nav-item-icon {
+            display: inline-block;
+            width: 20px;
+            margin-right: 10px;
+            text-align: center;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #6b7280; /* gray-500 */
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            transition: all 0.2s ease;
+        }
+        
+        .nav-toggle:hover {
+            background: #374151; /* gray-700 */
+            transform: translateY(-1px);
+        }
+        
+        .nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .main-content {
+            transition: margin-left 0.3s ease;
+        }
+        
+        @media (min-width: 1024px) {
+            .nav-sidebar {
+                position: relative;
+                transform: translateX(0);
+                width: 16rem; /* 256px - matches React w-64 */
+                min-height: 100vh;
+            }
+            
+            .nav-toggle {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                display: flex;
+            }
+            
+            .content-wrapper {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Toggle Button -->
+    <button class="nav-toggle" onclick="toggleNav()">
+        ☰
+    </button>
+    
+    <!-- Navigation Overlay -->
+    <div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
+    
+    <!-- Navigation Sidebar -->
+    <nav class="nav-sidebar" id="navSidebar">
+        <div class="nav-header">
+            <h2>Navigation</h2>
+        </div>
+        <div class="nav-menu">
+            <a href="http://localhost:3000/?view=start" class="nav-item">
+                <span class="nav-item-icon">🏠</span>
+                Start Here
+            </a>
+            <a href="http://localhost:3000/?view=graph" class="nav-item">
+                <span class="nav-item-icon">🌐</span>
+                Graph View
+            </a>
+            <a href="http://localhost:3000/?view=topics" class="nav-item">
+                <span class="nav-item-icon">🌲</span>
+                Topics
+            </a>
+            <a href="http://localhost:3000/?view=thoughts" class="nav-item">
+                <span class="nav-item-icon">💭</span>
+                Thoughts
+            </a>
+            <a href="http://localhost:3000/?view=quotes" class="nav-item">
+                <span class="nav-item-icon">💬</span>
+                Quotes
+            </a>
+            <a href="http://localhost:3000/?view=passages" class="nav-item">
+                <span class="nav-item-icon">📄</span>
+                Passages
+            </a>
+            <a href="http://localhost:3000/?view=tags" class="nav-item">
+                <span class="nav-item-icon">🏷️</span>
+                Tags
+            </a>
+            <a href="{% url 'topics:overview' %}" class="nav-item active">
+                <span class="nav-item-icon">🔗</span>
+                Topics (Full)
+            </a>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-wrapper">
+            <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>Topics Overview</h1>
+                <p>Explore your knowledge graph through hierarchical topics</p>
+                
+                {% if topics or search_query or level_filter is not None %}
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-number">{{ total_topics|default:0 }}</span>
+                            <div class="stat-label">
+                                {% if search_query %}
+                                    Search Results
+                                {% elif level_filter is not None %}
+                                    Level {{ level_filter }} Topics
+                                {% else %}
+                                    Total Topics
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        {% if level_stats %}
+                            <div class="stat-item">
+                                <span class="stat-number">{{ level_stats|length }}</span>
+                                <div class="stat-label">Hierarchy Levels</div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if page_obj %}
+                            <div class="stat-item">
+                                <span class="stat-number">{{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span>
+                                <div class="stat-label">Current Page</div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if level_stats %}
+                        <div class="level-stats">
+                            {% for level, count in level_stats %}
+                                <div class="level-stat">
+                                    Level {{ level }}: {{ count }} topics
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Search and Filter Controls -->
+        <div class="controls">
+            <form method="get" class="search-box">
+                <input type="text" 
+                       name="search" 
+                       placeholder="Search topics by title, description, or tags..." 
+                       value="{{ search_query|default:'' }}">
+                {% if level_filter is not None %}
+                    <input type="hidden" name="level" value="{{ level_filter }}">
+                {% endif %}
+            </form>
+            
+            <form method="get">
+                <select name="level" class="filter-select" onchange="this.form.submit()">
+                    <option value="">All Levels</option>
+                    {% for level, count in level_stats %}
+                        <option value="{{ level }}" {% if level_filter == level %}selected{% endif %}>
+                            Level {{ level }} ({{ count }})
+                        </option>
+                    {% endfor %}
+                </select>
+                {% if search_query %}
+                    <input type="hidden" name="search" value="{{ search_query }}">
+                {% endif %}
+            </form>
+            
+            <a href="{% url 'topics:hierarchy' %}" class="btn btn-primary">
+                📊 Hierarchy View
+            </a>
+            
+            <a href="{% url 'topics:api-stats' %}" class="btn btn-primary">
+                📈 Statistics
+            </a>
+        </div>
+        
+        {% if error %}
+            <div class="error">
+                <strong>Error:</strong> {{ error }}
+            </div>
+        {% elif not topics %}
+            <div class="empty-state">
+                <h3>
+                    {% if search_query %}
+                        No topics found for "{{ search_query }}"
+                    {% elif level_filter is not None %}
+                        No topics found at level {{ level_filter }}
+                    {% else %}
+                        No topics available
+                    {% endif %}
+                </h3>
+                <p>
+                    {% if search_query %}
+                        Try adjusting your search terms or <a href="{% url 'topics:overview' %}">browse all topics</a>.
+                    {% elif level_filter is not None %}
+                        Try selecting a different level or <a href="{% url 'topics:overview' %}">view all topics</a>.
+                    {% else %}
+                        Topics will appear here once they are created in the system.
+                    {% endif %}
+                </p>
+            </div>
+        {% else %}
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Tags</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for topic in topics %}
+                            <tr>
+                                <td>
+                                    <span class="level-badge">L{{ topic.level|default:0 }}</span>
+                                </td>
+                                <td class="topic-title">
+                                    <a href="{% url 'topics:detail' topic_id=topic.id %}">
+                                        {{ topic.display_title|default:topic.title|default:"Untitled" }}
+                                    </a>
+                                </td>
+                                <td class="topic-description">
+                                    {{ topic.short_description|default:topic.description|default:"No description available" }}
+                                </td>
+                                <td>
+                                    {% if topic.tags %}
+                                        {% for tag in topic.tags %}
+                                            <span class="tag">#{{ tag }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="tag" style="opacity: 0.5;">No tags</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'topics:detail' topic_id=topic.id %}" class="btn btn-primary" style="padding: 6px 12px; font-size: 14px;">
+                                        View Details
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj and page_obj.paginator.num_pages > 1 %}
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if level_filter is not None %}&level={{ level_filter }}{% endif %}">&laquo; First</a>
+                        <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if level_filter is not None %}&level={{ level_filter }}{% endif %}">&lsaquo; Previous</a>
+                    {% endif %}
+                    
+                    <span class="current">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if level_filter is not None %}&level={{ level_filter }}{% endif %}">Next &rsaquo;</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if level_filter is not None %}&level={{ level_filter }}{% endif %}">Last &raquo;</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <script>
+        // Enhanced JavaScript for M1 MacBook performance
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-submit search after typing stops
+            const searchInput = document.querySelector('input[name="search"]');
+            let searchTimeout;
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        this.form.submit();
+                    }, 500); // Wait 500ms after user stops typing
+                });
+            }
+            
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Focus search with Cmd+K (Mac) or Ctrl+K
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                    e.preventDefault();
+                    searchInput?.focus();
+                }
+                
+                // Clear search with Escape
+                if (e.key === 'Escape' && document.activeElement === searchInput) {
+                    searchInput.value = '';
+                    searchInput.form.submit();
+                }
+            });
+            
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+            
+            // Add loading states to buttons
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (this.href) {
+                        this.style.opacity = '0.7';
+                        this.style.pointerEvents = 'none';
+                    }
+                });
+            });
+        });
+        
+        // Navigation functions
+        function toggleNav() {
+            const sidebar = document.getElementById('navSidebar');
+            const overlay = document.getElementById('navOverlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+        
+        function closeNav() {
+            const sidebar = document.getElementById('navSidebar');
+            const overlay = document.getElementById('navOverlay');
+            
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+        }
+        
+        
+        // Close navigation when clicking nav items (on mobile)
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                if (window.innerWidth < 1024) {
+                    closeNav();
+                }
+            });
+        });
+    </script>
+        </div>
+    </div>
+</div>
+</body>
+</html>
